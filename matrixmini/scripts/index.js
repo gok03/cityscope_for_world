@@ -4,10 +4,10 @@ import { info } from "./RADAR/ui";
 import { radarInit, radarUpdate } from "./RADAR/radarSetup";
 import * as cityIOdemo from "./cityio_demo.json";
 
-var cityscope_server = "http://localhost";
+var cityscope_server = "http://cityscope.gok03.com";
 
 // global vars for fun
-let tableName = "grasbrook";
+let tableName = "test";
 
 let cityIOtableURL =
   cityscope_server+"/api/table/" + tableName.toString();

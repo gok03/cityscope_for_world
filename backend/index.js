@@ -7,7 +7,7 @@ import * as shadow from "/img/shadow.png";
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-var cityscope_server = "http://localhost";
+var cityscope_server = "http://cityscope.gok03.com";
 
 var updateInterval = 2000;
 

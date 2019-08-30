@@ -122,7 +122,7 @@ function finish(){
 	var settings = {
   "async": true,
   "crossDomain": true,
-  "url": "http://localhost:5000/",
+  "url": "http://cityscope.gok03.com:5000/",
   "method": "POST",
   "headers": {
     "content-type": "application/json"

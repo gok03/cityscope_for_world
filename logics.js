@@ -7,7 +7,7 @@ var Server = mongo.Server,
 var server = new Server('localhost', 27017, {auto_reconnect: true});
 db = new Db('cityio', server);
 
-var cityscope_server = "http://localhost";
+var cityscope_server = "http://cityscope.gok03.com";
 
 db.open(function(err, db) {
     if(!err) {

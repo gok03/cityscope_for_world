@@ -360,9 +360,9 @@ def get_scene(bound,h,w,name):
     return scene
 
 
-def finall(bound,h,w,name):
+def finall(bound,h,w,name,url_server,path_to_data_folder):
     a = run_all(bound,h,w)
-    path = "/Users/gokul/r/cityscope/IO/viewer/data/"+name
+    path = path_to_data_folder+name
     if(os.path.exists(path) == False):
     	os.mkdir(path)
     a[0].save(path+'/b1.png')
@@ -372,7 +372,7 @@ def finall(bound,h,w,name):
         json.dump(a[2],fh)
     with open(path+'/cityscope.json','w+') as fh:
         json.dump(a[3],fh)
-    requests.post(url='http://localhost/api/table/update/'+name, data=a[3])
+    requests.post(url=url_server+'/api/table/update/'+name, data=a[3])
     with open(path+'/scene.json','w+') as fh:
         json.dump(get_scene(bound,h,w,name),fh)
     return "success"
@@ -401,14 +401,16 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 @app.route("/", methods=['POST'])
 @cross_origin()
 def home():
+    url = "http://cityscope.gok03.com"
+    path_to_data_folder = "/home/ubuntu/cityscope_for_world/viewer/data/"
 	content = request.get_json(force=True)
 	h = 100
 	w = 65.95092024539878
 	name = content["name"]
 	bound = content["bound"]
 	email = content["email"]
-	link = "http://localhost/viewer/?name="+name
-	ret = finall(bound,h,w,name)
+	link = url+"/viewer/?name="+name
+	ret = finall(bound,h,w,name,url)
 	sendmail(link,email)
 	if(ret == "success"):
 		return link
