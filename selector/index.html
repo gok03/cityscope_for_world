@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+    <link rel="stylesheet" href="http://leaflet.github.io/Leaflet.label/leaflet.label.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/easy-autocomplete/1.3.5/easy-autocomplete.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+  </head>
+  <body>
+  	<div class="loading" style="display:none">Loading&#8230;</div>
+  	<div class="content" style="width: 100%;height: 100%">
+	    <nav class="navbar navbar-light bg-light">
+		  <span class="navbar-brand mb-0 h1">CityScope</span>
+		</nav>
+	    <div id="container">
+	      <div id="sidebar">
+	        <div class="sidebar-wrapper">
+	          <div id="features" class="panel panel-default">
+		          <div id="accordion">
+					  <div class="card">
+					    <div class="card-header" id="headingOne">
+					      <h5 class="mb-0">
+					        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+					          Search Map
+					        </button>
+					      </h5>
+					    </div>
+
+					    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+					      <div class="card-body">
+					        	<input id="autocomplete" type="text" placeholder="Select Place" style="width: 100%"><br/>
+					        	<button class="btn btn-outline-secondary" onclick="select_map()" >NEXT</button>
+					      </div>
+					    </div>
+					  </div>
+					  <div class="card">
+					    <div class="card-header" id="headingTwo">
+					      <h5 class="mb-0">
+					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+					          Select Area to Scan
+					        </button>
+					      </h5>
+					    </div>
+					    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+					      <div class="card-body">
+					        Area Selected : <span id="area_selected_field"></span> KM<sup>2</sup></br/>
+					        <button class="btn btn-outline-secondary" onclick="select_area()" >NEXT</button>
+					      </div>
+					    </div>
+					  </div>
+					  <div class="card">
+					    <div class="card-header" id="headingThree">
+					      <h5 class="mb-0">
+					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+					          Fill and Submit
+					        </button>
+					      </h5>
+					    </div>
+					    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+					      <div class="card-body">
+					      	<input id="c_name" class="form-control" type="text" placeholder="Enter Name (any name)" style="width: 100%"><br/>
+					      	<input id="c_email" class="form-control" type="text" placeholder="Enter Email " style="width: 100%"><br/><br/>
+					        	<button class="btn btn-outline-secondary" onclick="finish()" >Finish</button>
+					      </div>
+					    </div>
+					  </div>
+					</div>
+	          </div>
+	        </div>
+	      </div>
+	      <div id="map"></div>
+	    </div>
+	</div>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/easy-autocomplete/1.3.5/jquery.easy-autocomplete.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+    <script src="http://leaflet.github.io/Leaflet.label/leaflet.label.js"></script>
+    <script src="src/leaflet-areaselect.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

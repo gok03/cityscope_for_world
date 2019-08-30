@@ -1,0 +1,36 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto");
+
+body {
+  background-color: rgb(0, 0, 0);
+  margin: auto;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue",
+    Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: lighter;
+}
+
+.textDiv {
+  float: left;
+  padding: 1rem;
+  padding-top: 5vw;
+  font-family: "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial,
+    "Lucida Grande", sans-serif;
+  /* font-weight: bold; */
+  font-size: 2vw;
+  color: white;
+  max-width: 30vw;
+}
+
+.logoDiv {
+  float: left;
+  padding: 1rem;
+}
+
+.radarDiv {
+  float: right;
+  z-index: 10;
+}
+
+.legend {
+  font-family: "Roboto", sans-serif;
+  fill: #333333;
+}

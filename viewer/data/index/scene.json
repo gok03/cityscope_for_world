@@ -1,0 +1,142 @@
+{
+  "layers": [
+    {
+      "data": {
+        "blocks": [
+          {
+            "url": "./data/index/a0.json"
+          },
+          {
+            "url": "./data/index/a1.json"
+          },
+          {
+            "url": "./data/index/a2.json"
+          },
+          {
+            "url": "./data/index/a3.json"
+          },
+          {
+            "url": "./data/index/a4.json"
+          },
+          {
+            "url": "./data/index/a5.json"
+          },
+          {
+            "url": "./data/index/a6.json"
+          },
+          {
+            "url": "./data/index/a7.json"
+          },
+          {
+            "url": "./data/index/a8.json"
+          },
+          {
+            "url": "./data/index/a9.json"
+          },
+          {
+            "url": "./data/index/a10.json"
+          },
+          {
+            "url": "./data/index/a11.json"
+          },
+          {
+            "url": "./data/index/a12.json"
+          },
+          {
+            "url": "./data/index/a13.json"
+          },
+          {
+            "url": "./data/index/a14.json"
+          },
+          {
+            "url": "./data/index/a15.json"
+          },
+          {
+            "url": "./data/index/a16.json"
+          },
+          {
+            "url": "./data/index/a17.json"
+          },
+          {
+            "url": "./data/index/a18.json"
+          }
+        ],
+        "materials": [
+          {
+            "c": 9993655,
+            "type": 0
+          }
+        ]
+      },
+      "id": 0,
+      "properties": {
+        "name": "check_geo",
+        "objType": "Extruded",
+        "queryable": 1,
+        "type": "polygon",
+        "visible": true
+      },
+      "type": "layer"
+    },
+    {
+      "data": [
+        {
+          "block": 0,
+          "grid": {
+            "height": 2,
+            "url": "./data/index/b0.bin",
+            "width": 2
+          },
+          "height": 65.95092024539878,
+          "layer": 1,
+          "material": {
+            "ds": 1,
+            "image": {
+              "url": "./data/index/b0.png"
+            },
+            "type": 0
+          },
+          "sides": true,
+          "translate": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "type": "block",
+          "width": 100.0,
+          "zScale": 0.038800051629095,
+          "zShift": 0.0
+        }
+      ],
+      "id": 1,
+      "properties": {
+        "name": "Flat Plane",
+        "queryable": 1,
+        "shading": true,
+        "type": "dem",
+        "visible": true
+      },
+      "type": "layer"
+    }
+  ],
+  "properties": {
+    "baseExtent": [
+      -15895.774913189774,
+      6710917.857837231,
+      -13318.458755058351,
+      6712617.621561152
+    ],
+    "crs": "EPSG:3857",
+    "height": 65.95092024539878,
+    "proj": "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs",
+    "rotation": 0,
+    "wgs84Center": {
+      "lat": 51.50865948742152,
+      "lon": -0.131217963090132
+    },
+    "width": 100.0,
+    "zExaggeration": 1.0,
+    "zShift": 0.0
+  },
+  "type": "scene"
+}
