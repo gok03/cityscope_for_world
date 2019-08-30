@@ -1,0 +1,38 @@
+{
+  "grid": [],
+  "id": "",
+  "objects": {
+    "codes": [
+      "1111111111111111",
+      "0000000000000000",
+      "0000000000000000",
+      "0000111100001111"
+    ]
+  },
+  "header": {
+    "name": "github_user",
+    "longName": "github_user",
+    "block": ["type"],
+    "mapping": {
+      "type": {
+        "0": "White",
+        "1": "black",
+        "2": "third",
+        "3": "forth"
+      }
+    },
+    "spatial": {
+      "ncols": 2,
+      "nrows": 2,
+      "physical_longitude": 0,
+      "physical_latitude": 0,
+      "latitude": -20,
+      "longitude": 20,
+      "cellsize": 10
+    },
+    "owner": {
+      "name": "Ariel Noyman",
+      "institute": "City Science MIT Media Lab"
+    }
+  }
+}

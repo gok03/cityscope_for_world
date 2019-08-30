@@ -1,0 +1,34 @@
+{
+  "name": "cityscopeJS",
+  "version": "1.0.0",
+  "description": "MIT CityScope Scanner for Optically & Uniquely Tagged LEGO Objects",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CityScope/cityscopeJS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CityScope/cityscopeJS/issues"
+  },
+  "homepage": "https://github.com/CityScope/cityscopeJS#readme",
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "core-js": "^2.5.7",
+    "dat.gui": "^0.7.2",
+    "perspective-transform": "^1.1.3"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-runtime": "^6.26.0",
+    "cssnano": "^4.0.5"
+  }
+}

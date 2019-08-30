@@ -1,0 +1,84 @@
+html {
+  height: 100%;
+}
+
+/* hides native file loader for better UI */
+#my_file {
+  display: none;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  overflow: hidden;
+  font-family: Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 1vw;
+  background-color: rgb(39, 0, 40);
+  background-image: url(media/CSjs80s.svg), none;
+  background-position: center bottom;
+}
+a {
+  color: white;
+}
+
+.logo {
+  top: 85%;
+  left: 1%;
+  position: fixed;
+  z-index: 1000;
+}
+
+.webcamCanvas {
+  z-index: -1;
+  box-shadow: 5px 5px 35px rgb(0, 0, 0);
+  left: 0;
+  top: 0;
+}
+
+.transformedMatrix {
+  border: 1px solid rgb(255, 0, 255);
+  width: 1px;
+  height: 1px;
+  position: fixed;
+}
+
+.svgDiv {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1;
+}
+
+.svgVizGrid {
+  z-index: 10;
+}
+
+/* GUI */
+.dg.ac {
+  z-index: 1000 !important;
+}
+
+.infoDIV {
+  position: relative;
+  top: 10%;
+  left: 1%;
+  /* height: 8vw;
+  width: 80vw; */
+  z-index: 1000 !important;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scroll-behavior: auto;
+  text-align: left !important;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.2);
+  font-family: "Courier New", Courier, monospace;
+  font-size: 10px;
+}
+
+.infoDIV:hover {
+  background-color: rgba(255, 0, 255, 0.39);
+  cursor: help;
+}
