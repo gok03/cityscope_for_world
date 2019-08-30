@@ -403,19 +403,19 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 def home():
     url = "http://cityscope.gok03.com"
     path_to_data_folder = "/home/ubuntu/cityscope_for_world/viewer/data/"
-	content = request.get_json(force=True)
-	h = 100
-	w = 65.95092024539878
-	name = content["name"]
-	bound = content["bound"]
-	email = content["email"]
-	link = url+"/viewer/?name="+name
-	ret = finall(bound,h,w,name,url)
-	sendmail(link,email)
-	if(ret == "success"):
-		return link
-	else:
-		return "404"
+    content = request.get_json(force=True)
+    h = 100
+    w = 65.95092024539878
+    name = content["name"]
+    bound = content["bound"]
+    email = content["email"]
+    link = url+"/viewer/?name="+name
+    ret = finall(bound,h,w,name,url,path_to_data_folder)
+    sendmail(link,email)
+    if(ret == "success"):
+        return link
+    else:
+        return "404"
     
 if __name__ == "__main__":
     app.run(host= '0.0.0.0')
