@@ -22,7 +22,7 @@ app.get('/api/table/:name', logics.findbyname);
 app.get('/api/tables/list', logics.showall);
 app.post('/api/table/update/:name', logics.updatebyname);
 
-app.listen(3000,function(){
+app.listen(80,function(){
 console.log('running');
 });
 
