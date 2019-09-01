@@ -7,7 +7,6 @@ var Server = mongo.Server,
 var server = new Server('localhost', 27017, {auto_reconnect: true});
 db = new Db('cityio', server);
 
-var cityscope_server = "http://cityscope.gok03.com";
 
 db.open(function(err, db) {
     if(!err) {
@@ -40,10 +39,12 @@ exports.findbyname = function(req, res) {
 };
 
 exports.showall = function(req, res) {
+    var origin = req.headers.host;
+    console.log(origin);
     db.listCollections().toArray(function(err, collInfos) {
             var list_to_send = []
             for(var i in collInfos){
-                list_to_send.push(cityscope_server+"/api/table/"+collInfos[i]["name"])
+                list_to_send.push("http://"+origin+"/api/table/"+collInfos[i]["name"])
             }
             res.send(list_to_send);
         });

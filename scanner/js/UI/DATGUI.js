@@ -9,7 +9,7 @@ import "../Storage";
  * @return {void}
  */
 
-var cityscope_server = "http://cityscope.gok03.com";
+var cityscope_server = "http://"+window.location.hostname;
 
 export function datGUI() {
   // dat.GUI

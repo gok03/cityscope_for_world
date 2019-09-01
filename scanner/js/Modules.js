@@ -6,7 +6,7 @@ import "./Storage";
 //save/load local storage
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var cityscope_server = "http://cityscope.gok03.com";
+var cityscope_server = "http://"+window.location.hostname;
 
 ///JSON load function
 export function onFileLoad(loadEvent) {

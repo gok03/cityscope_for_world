@@ -412,8 +412,8 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 def home():
     #url = "http://cityscope.gok03.com"
     #path_to_data_folder = "/home/ubuntu/cityscope_for_world/viewer/data/"
-    url = "http://localhost"
-    path_to_data_folder = "/Users/gokul/r/cityscope/cityscope_for_world/viewer/data/"
+    url = request.environ.get('HTTP_ORIGIN', 'default value')
+    path_to_data_folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+"/viewer/data/"
     content = request.get_json(force=True)
     h = 100
     w = 65.95092024539878
@@ -427,7 +427,8 @@ def home():
         return link
     else:
         return "404"
-    
+
+
 if __name__ == "__main__":
     #app.run(host= '0.0.0.0')
     app.run(host= '0.0.0.0',debug=True)
