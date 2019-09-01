@@ -23,6 +23,7 @@ import requests
 from PIL import Image
 from math import pi, log, tan, exp, atan, log2, floor
 from pymongo import MongoClient 
+import shapely
 
 ZOOM0_SIZE = 512
 
@@ -121,6 +122,36 @@ def transfrom_latlng_to_m(lat,lng, bounds, h,w):
     y1,x1 = transformer.transform(lat, lng)
     return([(h/2)/y*y1,(w/2)/x*x1])
 
+def find_one_grid_for_single_goem(geom):
+    category_code = {"RL":0,"RM":1,"RS":2,"OL":3,"OM":4,"OS":5,"Amenities":7,"parking":9}
+    category_value = {"RL":["apartments","bungalow","dormitory","hotel"],"RM":["detached","farm","house","residential"],"RS":["cabin","houseboat","static_caravan","terrace"],"OL":["commercial","industrial","office"],"OM":["retail","warehouse"],"OS":["kiosk","supermarket"],"Amenities":["bakehouse","civic","government","hospital","kindergarten","public","school","toilets","train_station","transportation","university"],"parking":["carport","garage","garages","parking"]}
+    height = False
+    if "height" in geom["properties"]:
+        height = True
+    elif "building:height" in geom["properties"]:
+        height = True
+        geom["properties"]["height"] = geom["properties"]["building:height"]
+    
+    final_cat = "RM"
+    final_height = 1
+    
+    for cat,val in category_value.items():
+        if geom["properties"]["building"] in val:
+            final_cat = cat
+            
+    if(height):
+        if(geom["properties"]["height"] == geom["properties"]["height"]):
+            if(geom["properties"]["height"][-1] == 'm'):
+                geom["properties"]["height"][i] = geom["properties"]["height"][:-1]
+            final_height = float(geom["properties"]["height"])
+
+    if(final_height > 10):
+        final_height = final_height/10
+    elif(final_height <= 10):
+        final_height = 1
+
+    return(final_height,final_cat)
+
 def get_q3jsjson(jsondata,h,w,bounds):
     json1 = {
       "block": 0,
@@ -145,12 +176,17 @@ def get_q3jsjson(jsondata,h,w,bounds):
                     #else:
                     sub_poly.append(changed_lat_lng)
                 polygons.append(sub_poly)
-            geom = {"centroids": [[centroid[0],centroid[1],0.0]],"h":1,"polygons":[polygons]}
+            type_length = find_one_grid_for_single_goem(i)
+            geom = {"centroids": [[centroid[0],centroid[1],0.0]],"h":type_length[0],"cat":type_length[1],"polygons":[polygons]}
             feature["geom"] = geom
             if(not_overflow):
                 features.append(feature)
     json1["features"] = features
     return(json1)
+
+def g_inverse(gdf):
+    gdf.geometry = gdf.geometry.map(lambda polygon: shapely.ops.transform(lambda x, y: (y, x), polygon))
+    return gdf
 
 def round_10(n):
     return(int(n + 9) // 10 * 10)
@@ -172,15 +208,15 @@ def latlng_for_distance(lat,lng,distance,side):
 def matrix_latlng(ilat,ilng,x_distance,y_distance):
     latlng_height = []
     latlng_lenght = [(ilat,ilng)]
-    for i in range(10,y_distance+10,10):
+    for i in range(cellsize,y_distance+cellsize,cellsize):
         latlng_height.append(latlng_for_distance(ilat,ilng,i/1000,"y"))
-    for i in range(10,x_distance+10,10):
+    for i in range(cellsize,x_distance+cellsize,cellsize):
         latlng_lenght.append(latlng_for_distance(ilat,ilng,i/1000,"x"))
     return(latlng_lenght,latlng_height)
 
 def find_points(data):
     distances = find_distance_edge(data.total_bounds) # Finds the distance in meters in x,y
-    return(matrix_latlng(data.total_bounds[0],data.total_bounds[1],distances[1],distances[0])) # Find all the points of 10m matrix in latlng
+    return(matrix_latlng(data.total_bounds[0],data.total_bounds[1],distances[0],distances[1])) # Find all the points of 10m matrix in latlng
 
 def find_interaction(all_gpd,segment_bounds):
     bound = gpd.GeoSeries([Polygon(segment_bounds)])
@@ -189,33 +225,62 @@ def find_interaction(all_gpd,segment_bounds):
 
 def find_grid_gdf(gdf):
     matrix = find_points(gdf)
-    xlen = len(matrix[0])
-    ylen = len(matrix[1])
-    matrix_interactions = [[None]* ylen]* xlen
+    xlen = len(matrix[0])-1
+    ylen = len(matrix[1])-1
+    matrix_interactions = [[None]* xlen]* ylen
     #print(xlen,ylen,len(matrix_interactions),len(matrix_interactions[0]))
-    for x in range(0,xlen):
-        for y in range(0,ylen):
+    for y in range(0,ylen):
+        for x in range(0,xlen):
             #print(x,y)
-            bounds = [(matrix[0][x-1][0],matrix[1][y-1][1]),(matrix[0][x][0],matrix[1][y-1][1]),(matrix[0][x][0],matrix[1][y][1]),(matrix[0][x-1][0],matrix[1][y][1])]
-            matrix_interactions[x][y] = find_interaction(gdf,bounds)
+            bounds = [(matrix[0][x][0],matrix[0][y][1]),(matrix[0][x+1][0],matrix[1][y][1]),(matrix[0][x+1][0],matrix[1][y+1][1]),(matrix[0][x][0],matrix[1][y+1][1])]
+            matrix_interactions[y][x] = find_interaction(gdf,bounds)
     return(matrix_interactions,xlen,ylen)
 
 def find_one_grid(igdf):
-    count = 0
-    for i in range(0,len(igdf.building)):
-        if(igdf.building[i] == 'yes'):
-            count+=1
-    if(count == 0):
-        return([-1,0,0])
+    if(len(igdf.geometry) > 0):
+        count_yes = 0
+        count_category = {"RL":0,"RM":0,"RS":0,"OL":0,"OM":0,"OS":0,"Amenities":0,"parking":0}
+        category_code = {"RL":0,"RM":1,"RS":2,"OL":3,"OM":4,"OS":5,"Amenities":7,"parking":9}
+        category_value = {"RL":["apartments","bungalow","dormitory","hotel"],"RM":["detached","farm","house","residential"],"RS":["cabin","houseboat","static_caravan","terrace"],"OL":["commercial","industrial","office"],"OM":["retail","warehouse"],"OS":["kiosk","supermarket"],"Amenities":["bakehouse","civic","government","hospital","kindergarten","public","school","toilets","train_station","transportation","university"],"parking":["carport","garage","garages","parking"]}
+        height = False
+        height_count = 0
+        if "height" in igdf:
+            height = True
+        elif "building:height" in igdf:
+            igdf.columns=igdf.columns.str.replace('building:height','height')
+            height = True
+
+        for i in range(0,len(igdf.building)):
+            for cat,val in category_value.items():
+                if igdf.building[i] in val:
+                    count_category[cat] += 1
+                elif(igdf.building[i] == "yes"):
+                    count_yes = 1
+            if(height):
+                if(igdf.height[i] == igdf.height[i]):
+                    if(igdf.height[i][-1] == 'm'):
+                        igdf.height[i] = igdf.height[i][:-1]
+                    height_count += int(igdf.height[i])
+
+        final_cat = max(count_category, key=count_category.get)
+        if(count_category[final_cat] == 0):
+            final_cat = "RM"
+
+        final_height = 1
+        if(height_count > 10):
+            final_height = int(height_count/10)
+            
+        return([category_code[final_cat],final_height,0])
     else:
-        return([0,1,0])
+        return([-1,0,0])
 
 def find_grid_for_cs(gdf):
     igdfs,xlen,ylen = find_grid_gdf(gdf)
     grid_for_cs = [[None]*ylen]* xlen
-    for x in range(0,xlen):
-        for y in range(0,ylen):
-            grid_for_cs[x][y] = find_one_grid(igdfs[x][y])
+    for y in range(0,ylen):
+        for x in range(0,xlen):
+            #print(x,y)
+            grid_for_cs[y][x] = find_one_grid(igdfs[y][x])
     return(grid_for_cs,xlen,ylen)
 
 
@@ -234,7 +299,8 @@ def get_cityscope_json(geojson):
         "3": "OL",
         "4": "OM",
         "5": "OS",
-        "6": "ROAD"
+        "7": "Amenities",
+        "9": "parking"
       }
     }
     block = [
@@ -249,9 +315,9 @@ def get_cityscope_json(geojson):
       "cellsize": cellsize,
       "longitude": geojson.geometry[0].centroid.y,
       "rotation": 0,
-      "nrows": temp[2],
+      "nrows": temp[1],
       "latitude": geojson.geometry[0].centroid.x,
-      "ncols": temp[1],
+      "ncols": temp[2],
       "physical_latitude": geojson.geometry[0].centroid.x
     }
     final_api_data= {"grid":temp[0],"id":"","objects":{}, "header": {"spatial":spatial,"name":name,"block":block,"mapping":mapping,"owner":owner}}
