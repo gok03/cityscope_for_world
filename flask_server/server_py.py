@@ -22,6 +22,7 @@ import urllib.request
 import requests
 from PIL import Image
 from math import pi, log, tan, exp, atan, log2, floor
+from pymongo import MongoClient 
 
 ZOOM0_SIZE = 512
 
@@ -372,7 +373,8 @@ def finall(bound,h,w,name,url_server,path_to_data_folder):
         json.dump(a[2],fh)
     with open(path+'/cityscope.json','w+') as fh:
         json.dump(a[3],fh)
-    requests.post(url=url_server+'/api/table/update/'+name, data=a[3])
+    #requests.post(url='http://localhost:3000/api/table/update/'+name, data=a[3])
+    post_mongo(name,a[3])
     with open(path+'/scene.json','w+') as fh:
         json.dump(get_scene(bound,h,w,name),fh)
     return "success"
@@ -384,6 +386,13 @@ def sendmail(link,email):
         recipients=[email],
         body="Proccessing Completed! Link: "+link
     )
+
+def post_mongo(name,json):
+    conn = MongoClient("localhost", 27017)
+    db = conn.cityio
+    collection = db[name]
+    confirm = collection.insert_one(json)
+    return "success"
 
 app = Flask(__name__)
 app.config.update(
@@ -421,4 +430,5 @@ def home():
     
 if __name__ == "__main__":
     #app.run(host= '0.0.0.0')
-    app.run(debug=True)
+    app.run(host= '0.0.0.0',debug=True)
+
