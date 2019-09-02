@@ -2924,7 +2924,9 @@ Q3D.PolygonLayer.prototype.build = function (features) {
 
       // extruded geometry
       var geom = new THREE.ExtrudeBufferGeometry(shape, {bevelEnabled: false, amount: f.geom.h});
-      var mesh = new THREE.Mesh(geom, materials.mtl(f.mtl.face));
+      var color_dict = {"RL":"#052F5F","RM":"#005377","RS":"#06A77D","OL":"#F95738","OM":"#EE964B","OS":"#F4D35E","Amenities":"#EBEBD3","parking":"#262322"};
+      var mesh = new THREE.Mesh(geom, new THREE.MeshBasicMaterial( { color:  color_dict[f.geom.cat]} ));
+      //console.log(color_dict[f.geom.cat]);
       mesh.position.z = z;
 
       if (f.mtl.border !== undefined) {

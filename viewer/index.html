@@ -89,7 +89,22 @@
   <div id="closebtn1" onclick="document.getElementById('popup1').style.display = 'none';">&times;</div>
   <div id="popupbar1"></div>
   <div id="popupbody1">
-    <iframe src="http://localhost/matrixmini/?test1" height="500" width="500"></iframe>
+    <iframe id="ifr" src="about:blank" height="500" width="500"></iframe>
+  </div>
+</div>
+
+<div id="popup2">
+  <div id="popupbody2">
+    <ul class="legend">
+      <li><span class="RL"></span> RL</li>
+      <li><span class="RM"></span> RM</li>
+      <li><span class="RS"></span> RS</li>
+      <li><span class="OL"></span> OL</li>
+      <li><span class="OM"></span> OM</li>
+      <li><span class="OS"></span> OS</li>
+      <li><span class="Amenities"></span> Amenities</li>
+      <li><span class="Parking"></span> Parking</li>
+  </ul>
   </div>
 </div>
 
@@ -124,6 +139,7 @@ var c = url.searchParams.get("name");
 if(c == null){
   alert("No Name");
 }
+document.getElementById('ifr').src = "http://"+window.location.hostname+"/matrixmini/?"+c;
 app.loadJSONFile("./data/"+c+"/scene.json", function () {
   app.start();
 

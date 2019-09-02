@@ -191,6 +191,38 @@ body {
   overflow: auto;
 }
 
+
+/*popup2 */
+
+#popup2 {
+  position: absolute;
+  left: 2px;
+  bottom: 2px;
+  max-width: 100%;
+  min-width: 300px;
+  z-index: 9999;
+  display: all;
+}
+
+#popupbody2 {
+  padding: 2px 5px 2px;
+  max-height: 1000px;
+  overflow: auto;
+}
+
+.legend { list-style: none; }
+.legend li { float: left; margin-right: 10px; }
+.legend span { border: 1px solid #ccc; float: left; width: 12px; height: 12px; margin: 2px; }
+/* your colors */
+.legend .RL { background-color: #052F5F; }
+.legend .RM { background-color: #005377; }
+.legend .RS { background-color: #06A77D; }
+.legend .OL { background-color: #F95738; }
+.legend .OM { background-color: #EE964B; }
+.legend .OS { background-color: #F4D35E; }
+.legend .Amenities { background-color: #EBEBD3; }
+.legend .Parking { background-color: #262322; }
+
 /* identify result */
 #popupbody table {
   margin-top: 5px;

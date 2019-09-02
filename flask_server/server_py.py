@@ -27,6 +27,8 @@ import shapely
 
 ZOOM0_SIZE = 512
 
+#codes for obtaining base map png
+
 def g2p(lat, lon, zoom):
     return (
         ZOOM0_SIZE * (2 ** zoom) * (1 + lon / 180) / 2,
@@ -113,6 +115,8 @@ def get_geojson(bounds):
     response = overpass.request(query)
     return(response)
 
+#codes for q3js json
+
 def transfrom_latlng_to_m(lat,lng, bounds, h,w):
     center = ((bounds[0]+bounds[2])/2,(bounds[1]+bounds[3])/2)
     x = geodesic(center, (bounds[0],center[1])).m
@@ -184,6 +188,8 @@ def get_q3jsjson(jsondata,h,w,bounds):
     json1["features"] = features
     return(json1)
 
+#codes for cityscope json
+
 def g_inverse(gdf):
     gdf.geometry = gdf.geometry.map(lambda polygon: shapely.ops.transform(lambda x, y: (y, x), polygon))
     return gdf
@@ -227,14 +233,19 @@ def find_grid_gdf(gdf):
     matrix = find_points(gdf)
     xlen = len(matrix[0])-1
     ylen = len(matrix[1])-1
+    #xlen = 10
+    #ylen = 10
     matrix_interactions = [[None]* xlen]* ylen
-    #print(xlen,ylen,len(matrix_interactions),len(matrix_interactions[0]))
+    grid_for_cs = [[None]*xlen]* ylen
+    print(xlen,ylen,len(matrix_interactions[0]),len(matrix_interactions))
     for y in range(0,ylen):
         for x in range(0,xlen):
             #print(x,y)
             bounds = [(matrix[0][x][0],matrix[0][y][1]),(matrix[0][x+1][0],matrix[1][y][1]),(matrix[0][x+1][0],matrix[1][y+1][1]),(matrix[0][x][0],matrix[1][y+1][1])]
+            current_matrix = find_interaction(gdf,bounds)
             matrix_interactions[y][x] = find_interaction(gdf,bounds)
-    return(matrix_interactions,xlen,ylen)
+            grid_for_cs[y][x] = find_one_grid(current_matrix)
+    return(grid_for_cs,xlen,ylen,matrix_interactions)
 
 def find_one_grid(igdf):
     if(len(igdf.geometry) > 0):
@@ -274,19 +285,19 @@ def find_one_grid(igdf):
     else:
         return([-1,0,0])
 
-def find_grid_for_cs(gdf):
-    igdfs,xlen,ylen = find_grid_gdf(gdf)
-    grid_for_cs = [[None]*ylen]* xlen
-    for y in range(0,ylen):
-        for x in range(0,xlen):
-            #print(x,y)
-            grid_for_cs[y][x] = find_one_grid(igdfs[y][x])
-    return(grid_for_cs,xlen,ylen)
+# def find_grid_for_cs(gdf):
+#     igdfs,xlen,ylen = find_grid_gdf(gdf)
+#     grid_for_cs = [[None]*xlen]* ylen
+#     for y in range(0,ylen):
+#         for x in range(0,xlen):
+#             #print(x,y)
+#             grid_for_cs[y][x] = find_one_grid(igdfs[y][x])
+#     return(grid_for_cs,xlen,ylen)
 
 
-def get_cityscope_json(geojson):
+def get_cityscope_json(geojson,name,email):
     owner = {
-      "name": "Gokul",
+      "name": email,
       "title": "-",
       "institute": "-"
     }
@@ -308,8 +319,7 @@ def get_cityscope_json(geojson):
       "height",
       "rotation"
     ]
-    name = "test1_adyar"
-    temp = find_grid_for_cs(geojson)
+    temp = find_grid_gdf(geojson)
     spatial = {
       "physical_longitude": geojson.geometry[0].centroid.y,
       "cellsize": cellsize,
@@ -323,12 +333,13 @@ def get_cityscope_json(geojson):
     final_api_data= {"grid":temp[0],"id":"","objects":{}, "header": {"spatial":spatial,"name":name,"block":block,"mapping":mapping,"owner":owner}}
     return final_api_data
 
-def run_all(bounds,h,w):
+def run_all(bounds,h,w,name,email):
+    print(bounds)
     image = test([bounds[1],bounds[0],bounds[3],bounds[2]]) #PIL image
     osm_json = get_geojson(bounds)
-    q3jsjson = get_q3jsjson(overpass.as_geojson(osm_json, 'polygon'),h,w,bounds)
     geojson = overpass.as_geojson(osm_json, 'polygon') #geojson
-    cityscopejson = get_cityscope_json(gpd.GeoDataFrame.from_features(geojson))
+    cityscopejson = get_cityscope_json(g_inverse(gpd.GeoDataFrame.from_features(geojson)),name,email)
+    q3jsjson = get_q3jsjson(overpass.as_geojson(osm_json, 'polygon'),h,w,bounds)
     return(image,geojson,q3jsjson,cityscopejson)
 
 
@@ -427,8 +438,8 @@ def get_scene(bound,h,w,name):
     return scene
 
 
-def finall(bound,h,w,name,url_server,path_to_data_folder):
-    a = run_all(bound,h,w)
+def finall(bound,h,w,name,url_server,path_to_data_folder,email):
+    a = run_all(bound,h,w,name,email)
     path = path_to_data_folder+name
     if(os.path.exists(path) == False):
     	os.mkdir(path)
@@ -487,7 +498,7 @@ def home():
     bound = content["bound"]
     email = content["email"]
     link = url+"/viewer/?name="+name
-    ret = finall(bound,h,w,name,url,path_to_data_folder)
+    ret = finall(bound,h,w,name,url,path_to_data_folder,email)
     sendmail(link,email)
     if(ret == "success"):
         return link
