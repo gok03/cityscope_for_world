@@ -20,6 +20,30 @@
         "objType": "Extruded",
         "queryable": 1,
         "type": "polygon",
+        "visible": "false"
+      },
+      "type": "layer"
+    },
+    {
+      "data": {
+        "blocks": [
+          {
+            "url": "./data/l2/a1.json"
+          }
+        ],
+        "materials": [
+          {
+            "c": 12011595,
+            "type": 0
+          }
+        ]
+      },
+      "id": 1,
+      "properties": {
+        "name": "blocks",
+        "objType": "Extruded",
+        "queryable": 1,
+        "type": "polygon",
         "visible": "true"
       },
       "type": "layer"
@@ -54,7 +78,7 @@
           "zShift": 0.0
         }
       ],
-      "id": 1,
+      "id": 2,
       "properties": {
         "name": "Flat Plane",
         "queryable": 1,
