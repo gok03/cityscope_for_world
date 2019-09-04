@@ -1,9 +1,9 @@
 # cityscope_for_world
-https://cityio.media.mit.edu extension for any part of world.
+https://cityio.media.mit.edu application for any part of the world. (Dev Incomplete)
 
-Use http://cityscope.gok03.com/ to test.
-Some of the analysed links are,
-MIT (http://cityscope.gok03.com/viewer/?name=mit)
+Use http://cityscope.gok03.com/ to test.  
+Some of the analysed links are,  
+MIT (http://cityscope.gok03.com/viewer/?name=mit)  
 Hamburg (http://cityscope.gok03.com/viewer/?name=hamburg)
 
 ## Install Instruction
@@ -14,11 +14,13 @@ Hamburg (http://cityscope.gok03.com/viewer/?name=hamburg)
 5. Run node server.js (starts at port 80)
 6. Goto your-url
 
-Most of the code was clone from https://github.com/CityScope/
-
-The works of https://github.com/CityScope/CS_CityIO team interested me to extend the work to my home town and eventually generalised for any place using OSM data.
+Most of the code was clone from https://github.com/CityScope/  
+The works of https://www.media.mit.edu/projects/cityscope/overview/ team interested me to extend the work to my hometown adyar/chennai(http://cityscope.gok03.com/viewer/?name=adyar) and eventually generalised for any place using OSM data.
 
 To-Do
-1. Implement Interactive module to update height and type of block.
-2. Improve the interface to provide informations.
+1. Add more data points to Layers(road, trees, etc)
+2. Review citymatrix working for data
+3. Implement Interactive module to update height and type of block.
+4. Implement CS mobility module
+4. Improve the interface to provide inference informations.
 
