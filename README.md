@@ -3,7 +3,7 @@ https://cityio.media.mit.edu application for any part of the world. (Dev Incompl
 
 Use http://cityscope.gok03.com/ to test.  
 Some of the analysed links are,  
-MIT (http://cityscope.gok03.com/viewer/?name=mit)  
+MIT (http://cityscope.gok03.com/viewer/?name=mit1)  
 Hamburg (http://cityscope.gok03.com/viewer/?name=hamburg)
 
 ## Install Instruction
