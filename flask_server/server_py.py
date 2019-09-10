@@ -3,8 +3,11 @@
 
 # # CityScope For World
 
-cellsize = 10 #ref 10m = 1 block
-from flask import Flask,request
+cellsize = 20 #ref 10m = 1 block
+max_blocks_x = 20
+max_blocks_y = 20
+buffer = 0.2
+from flask import Flask,request,jsonify
 from flask_cors import CORS, cross_origin
 from flask_mail import Mail,  Message
 import geopandas as gpd
@@ -24,8 +27,9 @@ import urllib.request
 import requests
 from PIL import Image
 from math import pi, log, tan, exp, atan, log2, floor
-from pymongo import MongoClient 
+from pymongo import MongoClient, DESCENDING
 import shapely
+from bson.json_util import dumps
 
 ## Codes for image
 
@@ -322,11 +326,18 @@ def get_scene(bound,h,w,name):
 def round_10(n):
     return(int(n + 9) // 10 * 10)
 
+def round_near_x(n,x):
+    return(int(n + 9) // x * x)
+
 def find_distance_edge(bounds_map):
     coords_1 = (bounds_map[0], bounds_map[1])
     coords_2 = (bounds_map[0], bounds_map[3])
     coords_3 = (bounds_map[2], bounds_map[1])
-    return (round_10(geopy.distance.distance(coords_1, coords_3).m), round_10(geopy.distance.distance(coords_1, coords_2).m))
+    xlen = round_near_x(geopy.distance.distance(coords_1, coords_3).m,max_blocks_x)
+    ylen = round_near_x(geopy.distance.distance(coords_1, coords_2).m,max_blocks_y)
+    x_count = int(xlen/max_blocks_x)
+    y_count = int(ylen/max_blocks_y)
+    return (xlen,ylen,x_count,y_count)
 
 def latlng_for_distance(lat,lng,distance,side):
     origin = geopy.Point(lat, lng)
@@ -336,21 +347,23 @@ def latlng_for_distance(lat,lng,distance,side):
         destination = geodesic(kilometers=distance).destination(origin, 0)
     return(round(destination.latitude,7), round(destination.longitude,7))
 
-def matrix_latlng(ilat,ilng,x_distance,y_distance):
+def matrix_latlng(ilat,ilng,x_distance,y_distance,x_count,y_count):
     latlng_height = [(ilat,ilng)]
     latlng_lenght = [(ilat,ilng)]
-    for i in range(cellsize,y_distance+cellsize,cellsize):
+    for i in range(y_count,y_distance+y_count,y_count):
         latlng_height.append(latlng_for_distance(ilat,ilng,i/1000,"y"))
-    for i in range(cellsize,x_distance+cellsize,cellsize):
+    for i in range(x_count,x_distance+x_count,x_count):
         latlng_lenght.append(latlng_for_distance(ilat,ilng,i/1000,"x"))
-    return(latlng_lenght,latlng_height)
+    return([latlng_lenght,latlng_height],[x_count,y_count])
 
 def find_points(data):
     distances = find_distance_edge(data.total_bounds) # Finds the distance in meters in x,y
-    return(matrix_latlng(data.total_bounds[0],data.total_bounds[1],distances[0],distances[1]))
+    print(data.total_bounds[0],data.total_bounds[1],distances[0],distances[1],distances[2],distances[3])
+    return(matrix_latlng(data.total_bounds[0],data.total_bounds[1],distances[0],distances[1],distances[2],distances[3]))
 
 def find_matrix_points(gdf,h,w):
-    points = find_points(gdf)
+    points_distance = find_points(gdf)
+    points = points_distance[0]
     block_points = []
     for i in points:
         temp_points = []
@@ -358,10 +371,9 @@ def find_matrix_points(gdf,h,w):
             temp = transfrom_latlng_to_m(j[0],j[1],gdf.total_bounds,h,w)
             temp_points.append([temp[0],temp[1]])
         block_points.append(temp_points)
-    return block_points
+    return(block_points,points_distance[1])
 
 def reduce_by_05(bounds):
-    buffer = 0.05
     a1 = [bounds[0][0][0][0]+buffer,bounds[0][0][0][1]+buffer]
     a2 = [bounds[0][0][1][0]-buffer,bounds[0][0][1][1]+buffer]
     a3 = [bounds[0][0][2][0]-buffer,bounds[0][0][2][1]-buffer]
@@ -412,7 +424,8 @@ def find_one_grid(igdf):
         return([-1,0,0])
 
 def find_block_json(gdf,new_grid,h,w):
-    matrix = find_matrix_points(gdf,h,w)
+    matrix_distance = find_matrix_points(gdf,h,w)
+    matrix = matrix_distance[0]
     ylen = len(matrix[0])-1
     xlen = len(matrix[1])-1
     #ylen = 10
@@ -426,9 +439,8 @@ def find_block_json(gdf,new_grid,h,w):
     dict_type = {0:"RL",1:"RM",2:"RS",3:"OL",4:"OM",5:"OS",7:"Amenities",9:"parking",-1:"road"}
     grid_for_cs = []
     for y in range(ylen):
-        grid_for_cs_1 = []
         for x in range(0,xlen):
-            feature = {"ids":str(y)+str(x),"tags":{},"mtl":{"face":0}}
+            feature = {"ids":str(y)+"-"+str(x),"tags":{},"mtl":{"face":0}}
             #print(y,x)
             p1 = [matrix[1][x][0],matrix[0][y][1]]
             p2 = [matrix[1][x+1][0],matrix[0][y][1]]
@@ -441,17 +453,16 @@ def find_block_json(gdf,new_grid,h,w):
             centroid = [(p1[0]+p3[0])/2,(p1[1]+p3[1])/2]
             current_matrix = find_interaction(new_grid,pbounds)
             grid_value = find_one_grid(current_matrix)
-            grid_for_cs_1.append(grid_value)
+            grid_for_cs.append(grid_value)
             #geom = {"centroids": [[centroid[0],centroid[1],0.0]],"h":grid[y][x][1] ,"cat": dict_type[grid[y][x][0]],"polygons":bounds}
             #print(str(x)+","+str(y)+":"+str(len(current_matrix.geometry))+"//"+str(grid_value))
-            geom = {"centroids": [[centroid[0],centroid[1],0.0]],"h":1 ,"cat": dict_type[grid_value[0]],"polygons":bounds}
+            geom = {"centroids": [[centroid[0],centroid[1],0.0]],"h":grid_value[1] ,"cat": dict_type[grid_value[0]],"polygons":bounds}
             feature["geom"] = geom
             features.append(feature)
-        grid_for_cs.append(grid_for_cs_1)
     json1["features"] = features
-    return(json1,grid_for_cs,xlen,ylen)
+    return(json1,grid_for_cs,xlen,ylen,matrix_distance[1][0],matrix_distance[1][1])
 
-def get_cityscope_json(geojson,grid,name,email,x,y):
+def get_cityscope_json(geojson,grid,name,email,x,y,x_count,y_count):
     owner = {
       "name": email,
       "title": "-",
@@ -475,8 +486,11 @@ def get_cityscope_json(geojson,grid,name,email,x,y):
       "height",
       "rotation"
     ]
-    temp = grid
     spatial = {
+      "x_block_size": x_count,
+      "Y_block_size": y_count,
+      "x_length": x_count*x,
+      "y_length": y_count*y,
       "physical_longitude": geojson.geometry[0].centroid.y,
       "cellsize": cellsize,
       "longitude": geojson.geometry[0].centroid.y,
@@ -486,7 +500,7 @@ def get_cityscope_json(geojson,grid,name,email,x,y):
       "ncols": y,
       "physical_latitude": geojson.geometry[0].centroid.x
     }
-    final_api_data= {"grid":temp[0],"id":"","objects":{}, "header": {"spatial":spatial,"name":name,"block":block,"mapping":mapping,"owner":owner}}
+    final_api_data= {"grid":grid,"id":"","objects":{}, "header": {"spatial":spatial,"name":name,"block":block,"mapping":mapping,"owner":owner}}
     return final_api_data
 
 def run_all(bounds,h,w,name,email):
@@ -498,7 +512,7 @@ def run_all(bounds,h,w,name,email):
     q3json = get_q3jsjson(geojson,h,w,bound)
     new_gdf = gpd.GeoDataFrame.from_features(q3json[1])
     find = find_block_json(gdf,new_gdf,h,w)
-    cityscope_json = get_cityscope_json(gdf,find[1],name,email,find[2],find[3])
+    cityscope_json = get_cityscope_json(gdf,find[1],name,email,find[2],find[3],find[4],find[5])
     q3jsjson = find[0]
     blocks = q3json[0]
     scene = get_scene(bound,h,w,name)
@@ -533,9 +547,7 @@ def sendmail(link,email):
         body="Proccessing Completed! Link: "+link
     )
 
-def post_mongo(name,json):
-    conn = MongoClient("localhost", 27017)
-    db = conn.cityio
+def post_mongo(name,json):  
     collection = db[name]
     confirm = collection.insert_one(json)
     return "success"
@@ -552,6 +564,9 @@ mail = Mail(app)
 
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+
+conn = MongoClient("localhost", 27017)
+db = conn.cityio
 
 @app.route("/", methods=['POST'])
 @cross_origin()
@@ -574,6 +589,29 @@ def home():
     else:
         return "404"
 
+@app.route("/block_update/<name>/<cat>/<h>/<row>/<block>", methods=['POST'])
+@cross_origin()
+def block_update(name,cat,h,row,block):
+    collection = db[name]
+    data = collection.find().sort([('_id', DESCENDING)]).limit(1)
+    grid = json.loads(dumps(data))
+    category_code = {"RL":0,"RM":1,"RS":2,"OL":3,"OM":4,"OS":5,"Amenities":7,"parking":9}
+    path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+"/viewer/data/"+name
+    if(len(grid) == 0):
+        return jsonify({'error':'Invalid User'})
+    else:
+        grid[0]["grid"][(int(row)*int(grid[0]["header"]["spatial"]["ncols"]))+int(block)] = [category_code[cat],int(h),0]
+        grid[0].pop('_id', None)
+        confirm = collection.insert_one(grid[0])
+        with open(path+'/a0.json') as json_file:
+            json_data = json.load(json_file)
+        for i in json_data["features"]:
+            if(i["ids"] == row+"-"+block):                
+                i["geom"]["h"] = int(h)
+                i["geom"]["cat"] = cat
+        with open(path+'/a0.json','w+') as fh:
+            json.dump(json_data,fh)
+        return "success"
 
 if __name__ == "__main__":
     #app.run(host= '0.0.0.0')

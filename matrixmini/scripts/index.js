@@ -13,12 +13,12 @@ let cityIOtableURL =
   cityscope_server+"/api/table/" + tableName.toString();
 
 if (window.location.search) {
-  console.log(window.location.search);
+  //console.log(window.location.search);
   cityIOtableURL =
     cityscope_server+"/api/table/" +
     window.location.search.substr(1);
 }
-console.log(cityIOtableURL);
+//console.log(cityIOtableURL);
 
 //update interval
 let interval = 2000;
@@ -28,7 +28,9 @@ async function init() {
   //init the radar
   let radarChartObj = radarInit();
   //send a bare-bone radar to update function
-  cityIOupdater(radarChartObj);
+  // cityIOupdater(radarChartObj);
+  let cityIOdata = await getCityIO(cityIOtableURL); 
+  radarUpdate(cityIOdata, radarChartObj, interval);
 }
 
 ////////////////////////////////////////////////////////////////////

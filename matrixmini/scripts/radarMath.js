@@ -29,7 +29,7 @@ export class RadarMath {
   ///////////////////////////
 
   moduleCall() {
-    console.log();
+    //console.log();
   }
 ///////////////////////////
 
@@ -59,7 +59,7 @@ RadarData() {
     }
     //console.log(type);
     //console.log("there is : " + ratioCount + " type " + type);
-    console.log("There is " + ratioCount + " of type" + type);
+    //console.log("There is " + ratioCount + " of type" + type);
     return (ratioCount/d.length)*10;
   }
   ///////////////////////////

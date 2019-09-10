@@ -1,153 +1,368 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta charset="UTF-8">
-<title>index</title>
-<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-<link rel="stylesheet" type="text/css" href="./Qgis2threejs.css">
-<script src="./threejs/three.min.js"></script>
-<script src="./threejs/OrbitControls.js"></script>
-<script src="./proj4js/proj4.js"></script>
-<script src="./dat-gui/dat.gui.min.js"></script>
-<script src="./Qgis2threejs.js"></script>
-<script src="./dat-gui_panel.js"></script>
+    <meta charset="UTF-8">
+    <title>index</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="./Qgis2threejs.css">
+    <script src="./threejs/three.min.js"></script>
+    <script src="./threejs/OrbitControls.js"></script>
+    <script src="./proj4js/proj4.js"></script>
+    <script src="./dat-gui/dat.gui.min.js"></script>
+    <script src="./Qgis2threejs.js"></script>
+    <script src="./dat-gui_panel.js"></script>
 </head>
+
 <body>
-<div id="view">
-  <div id="labels"></div>
-  <div id="northarrow"></div>
-</div>
+    <div id="container">
+        <div id="mini_body">
+            <div id="view">
+                <div id="labels"></div>
+                <div id="northarrow"></div>
+            </div>
+            <!-- popup -->
+            <div id="popup">
+                <div id="closebtn">&times;</div>
+                <div id="popupbar"></div>
+                <div id="popupbody">
+                    <div id="popupcontent"></div>
+                    <!-- query result -->
+                    <div id="queryresult">
+                        <table id="qr_layername_table">
+                            <caption>Layer name</caption>
+                            <tr>
+                                <td id="qr_layername"></td>
+                            </tr>
+                        </table>
+                        <table id="qr_coords_table">
+                            <caption>Clicked coordinates</caption>
+                            <tr>
+                                <td id="qr_coords"></td>
+                            </tr>
+                        </table>
+                        <!-- camera actions -->
+                        <div class="action-btn action-zoom" onclick="app.cameraAction.zoomIn(); app.closePopup();">Zoom in here</div>
+                        <div class="action-btn action-move" onclick="app.cameraAction.move(); app.closePopup();">Move here</div>
+                        <div class="action-btn action-orbit" onclick="app.cameraAction.orbit(); app.closePopup();">Orbit around here</div>
+                        <!-- attributes -->
+                        <table id="qr_attrs_table">
+                            <caption>Attributes</caption>
+                        </table>
+                    </div>
+                    <!-- page info -->
+                    <div id="pageinfo">
+                        <h1>Current View URL</h1>
+                        <div><input id="urlbox" type="text"></div>
+                        <h1>Usage</h1>
+                        <table id="usage">
+                            <tr>
+                                <td colspan="2" class="star">Mouse</td>
+                            </tr>
+                            <tr>
+                                <td>Left button + Move</td>
+                                <td>Orbit</td>
+                            </tr>
+                            <tr>
+                                <td>Mouse Wheel</td>
+                                <td>Zoom</td>
+                            </tr>
+                            <tr>
+                                <td>Right button + Move</td>
+                                <td>Pan</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="star">Keys</td>
+                            </tr>
+                            <tr>
+                                <td>Arrow keys</td>
+                                <td>Move Horizontally</td>
+                            </tr>
+                            <tr>
+                                <td>Shift + Arrow keys</td>
+                                <td>Orbit</td>
+                            </tr>
+                            <tr>
+                                <td>Ctrl + Arrow keys</td>
+                                <td>Rotate</td>
+                            </tr>
+                            <tr>
+                                <td>Shift + Ctrl + Up / Down</td>
+                                <td>Zoom In / Out</td>
+                            </tr>
+                            <tr>
+                                <td>L</td>
+                                <td>Toggle Label Visibility</td>
+                            </tr>
+                            <tr>
+                                <td>R</td>
+                                <td>Start / Stop Rotate Animation (Orbiting)</td>
+                            </tr>
+                            <tr>
+                                <td>W</td>
+                                <td>Wireframe Mode</td>
+                            </tr>
+                            <tr>
+                                <td>Shift + R</td>
+                                <td>Reset Camera Position</td>
+                            </tr>
+                            <tr>
+                                <td>Shift + S</td>
+                                <td>Save Image</td>
+                            </tr>
+                        </table>
+                        <h1>About</h1>
+                        <div id="about">
+                            This page was made with <a href="https://www.qgis.org/" target="_blank">QGIS</a> and <a href="https://github.com/minorua/Qgis2threejs" target="_blank">Qgis2threejs</a> plugin.
+                            Dependent JavaScript libraries are
+                            <a href="https://threejs.org/" target="_blank">three.js</a>,
+                            <a href="https://code.google.com/p/dat-gui/" target="_blank">dat-gui</a>
+                            <span id="lib_proj4js"> and <a href="https://trac.osgeo.org/proj4js/" target="_blank">Proj4js</a></span>
+                            .
+                        </div>
+                    </div>
+                </div>
+            </div>
+<!--             <div id="popup1" style="display: none;">
+                <div id="closebtn1" onclick="document.getElementById('popup1').style.display = 'none';">&times;</div>
+                <div id="popupbar1"></div>
+                <div id="popupbody1">
+                    <iframe id="ifr" src="about:blank" height="500" width="500"></iframe>
+                </div>
+            </div> -->
+            <div id="popup2">
+                <div id="popupbody2">
+                    <ul class="legend">
+                        <li><span class="RL"></span> RL</li>
+                        <li><span class="RM"></span> RM</li>
+                        <li><span class="RS"></span> RS</li>
+                        <li><span class="OL"></span> OL</li>
+                        <li><span class="OM"></span> OM</li>
+                        <li><span class="OS"></span> OS</li>
+                        <li><span class="Amenities"></span> Amenities</li>
+                        <li><span class="Parking"></span> Parking</li>
+                        <li><span class="Others"></span> Others</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- progress bar -->
+            <div id="progress">
+                <div id="bar"></div>
+            </div>
+            <!-- header and footer -->
+            <div id="header"></div>
+            <div id="footer"></div>
+        </div>
+          <div id="sidebar">
+            <div id="matrix">
+              <iframe id="ifr" src="about:blank" height="480" width="480"></iframe>
+            </div>
+              <center><b>Layer Controls</b></center>
+              <div id="layer_controls">
+                <div id="toggle" style="width: 60%; padding-left: 10%">
+                  <input id="toggle-on" class="toggle toggle-left" name="toggle" value="false" type="radio" checked onclick="show_blocks()">
+                  <label for="toggle-on" class="btn1">Blocks</label>
+                  <input id="toggle-off" class="toggle toggle-right" name="toggle" value="true" type="radio" onclick="show_buildings()">
+                  <label for="toggle-off" class="btn1">Buildings</label>
+                </div>
+                <div class="squaredFour" style="width: 30%">
+                  <input type="checkbox" value="None" id="squaredFour" name="check" checked onclick="toggle_height()" />
+                  <label for="squaredFour"></label>  &nbsp; Show Height
+                </div>
+              </div>
+              <hr>
+              <div id="block_div">
+                  <div id="block_controls">
+                    <center><b>Block Controls</b></center>
+                    <div id="block_details" style="display: flex;">
+                        <div style="width: 30%;padding-left: 10px">
+                            Type of Block: <br/>
+                            <div style="padding-top: 5%">Block Height: </div>
+                        </div>
+                        <div style="width: 40%">
+                            <span>
+                                <select id="block_type" onchange="block_details_changes()">
+                                  <option value="RL">Residence Large</option>
+                                  <option value="RM">Residence Medium</option>
+                                  <option value="RS">Residence Small</option>
+                                  <option value="OL">Office Large</option>
+                                  <option value="OM">Office Medium</option>
+                                  <option value="OS">Office Small</option>
+                                  <!-- <option value="road">ROAD</option> -->
+                                  <option value="Amenities">Amenities</option>
+                                  <!-- <option value="Park">PARK</option> -->
+                                  <option value="parking">Parking</option>
+                                  <option value="others">Others</option>
+                                </select><br/>
+                                <div style="padding-top: 3%"><b><input type="number" onchange="block_details_changes()" id="block_height"/></b></div>
+                            </span> 
+                        </div>
+                        <div style="width: 40%">
+                            Row: <b><span id="block_row"></span></b>&nbsp;
+                            Block: <b><span id="block_block"></span></b>
+                            <br/>
+                            <div style="padding-top: 5%"><button id="block_save" onclick="update_block()">SAVE CHANGES</button></div>
+                        </div>
+                    </div>
+                  </div>
+                  <span id="block_select_text"><h1>Select a Block</h1></span>
+              </div>
+              
 
-<!-- popup -->
-<div id="popup">
-  <div id="closebtn">&times;</div>
-  <div id="popupbar"></div>
-  <div id="popupbody">
-    <div id="popupcontent"></div>
-
-    <!-- query result -->
-    <div id="queryresult">
-      <table id="qr_layername_table">
-        <caption>Layer name</caption>
-        <tr><td id="qr_layername"></td></tr>
-      </table>
-
-      <table id="qr_coords_table">
-        <caption>Clicked coordinates</caption>
-        <tr><td id="qr_coords"></td></tr>
-      </table>
-
-      <!-- camera actions -->
-      <div class="action-btn action-zoom" onclick="app.cameraAction.zoomIn(); app.closePopup();">Zoom in here</div>
-      <div class="action-btn action-move" onclick="app.cameraAction.move(); app.closePopup();">Move here</div>
-      <div class="action-btn action-orbit" onclick="app.cameraAction.orbit(); app.closePopup();">Orbit around here</div>
-
-      <!-- attributes -->
-      <table id="qr_attrs_table">
-        <caption>Attributes</caption>
-      </table>
+          </div>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script>
+    if (typeof proj4 === "undefined") document.getElementById("lib_proj4js").style.display = "none";
+    var height_option_1 = false;
+    var current_layer = "blocks";
+    var url = new URL(window.location.href);
+    var c = url.searchParams.get("name");
+    if (c == null) {
+        alert("No Name");
+    }
+    ifr_id = document.getElementById('ifr');
+    function ifr_load(){
+        ifr_id.src = "http://" + window.location.hostname + "/matrixmini/?" + c;
+    }
+    ifr_load();
 
-    <!-- page info -->
-    <div id="pageinfo">
-      <h1>Current View URL</h1>
-      <div><input id="urlbox" type="text"></div>
+    // Initialize to render layers
+    var app = Q3D.application,
+        container = document.getElementById("view");
 
-      <h1>Usage</h1>
-      <table id="usage">
-        <tr><td colspan="2" class="star">Mouse</td></tr>
-        <tr><td>Left button + Move</td><td>Orbit</td></tr>
-        <tr><td>Mouse Wheel</td><td>Zoom</td></tr>
-        <tr><td>Right button + Move</td><td>Pan</td></tr>
+        app.init(container); // initialize application
 
-        <tr><td colspan="2" class="star">Keys</td></tr>
-        <tr><td>Arrow keys</td><td>Move Horizontally</td></tr>
-        <tr><td>Shift + Arrow keys</td><td>Orbit</td></tr>
-        <tr><td>Ctrl + Arrow keys</td><td>Rotate</td></tr>
-        <tr><td>Shift + Ctrl + Up / Down</td><td>Zoom In / Out</td></tr>
-        <tr><td>L</td><td>Toggle Label Visibility</td></tr>
-        <tr><td>R</td><td>Start / Stop Rotate Animation (Orbiting)</td></tr>
-        <tr><td>W</td><td>Wireframe Mode</td></tr>
-        <tr><td>Shift + R</td><td>Reset Camera Position</td></tr>
-        <tr><td>Shift + S</td><td>Save Image</td></tr>
-      </table>
+        // when all relevant files have been loaded into the scene
+        app.addEventListener("sceneLoaded", function() {
+            // set custom plane z range
+            var box = new THREE.Box3().setFromObject(app.scene),
+                zMin = app.scene.toMapCoordinates(0, 0, box.min.y).z,
+                zMax = app.scene.toMapCoordinates(0, 0, box.max.y).z;
+            Q3D.gui.initCustomPlaneFolder(zMin, zMax);
+        });
 
-      <h1>About</h1>
-      <div id="about">
-        This page was made with <a href="https://www.qgis.org/" target="_blank">QGIS</a> and <a href="https://github.com/minorua/Qgis2threejs" target="_blank">Qgis2threejs</a> plugin.
-        Dependent JavaScript libraries are
-        <a href="https://threejs.org/" target="_blank">three.js</a>, 
-        <a href="https://code.google.com/p/dat-gui/" target="_blank">dat-gui</a>
-        <span id="lib_proj4js"> and <a href="https://trac.osgeo.org/proj4js/" target="_blank">Proj4js</a></span>
-        .
-      </div>
-    </div>
-  </div>
-</div>
+    function render_layers(){    
+        $("body > div.dg.ac > div").remove();
+       // load the scene
+        app.loadJSONFile("./data/" + c + "/scene.json", function() {
+            app.start();
 
-<div id="popup1">
-  <div id="closebtn1" onclick="document.getElementById('popup1').style.display = 'none';">&times;</div>
-  <div id="popupbar1"></div>
-  <div id="popupbody1">
-    <iframe id="ifr" src="about:blank" height="500" width="500"></iframe>
-  </div>
-</div>
+            Q3D.gui.init(); // initialize dat-gui panel
 
-<div id="popup2">
-  <div id="popupbody2">
-    <ul class="legend">
-      <li><span class="RL"></span> RL</li>
-      <li><span class="RM"></span> RM</li>
-      <li><span class="RS"></span> RS</li>
-      <li><span class="OL"></span> OL</li>
-      <li><span class="OM"></span> OM</li>
-      <li><span class="OS"></span> OS</li>
-      <li><span class="Amenities"></span> Amenities</li>
-      <li><span class="Parking"></span> Parking</li>
-  </ul>
-  </div>
-</div>
-
-<!-- progress bar -->
-<div id="progress"><div id="bar"></div></div>
-
-<!-- header and footer -->
-<div id="header"></div>
-<div id="footer"></div>
-
-<script>
-
-if (typeof proj4 === "undefined") document.getElementById("lib_proj4js").style.display = "none";
-
-var app = Q3D.application,
-    container = document.getElementById("view");
-
-app.init(container);      // initialize application
-
-// when all relevant files have been loaded into the scene
-app.addEventListener("sceneLoaded", function () {
-  // set custom plane z range
-  var box = new THREE.Box3().setFromObject(app.scene),
-      zMin = app.scene.toMapCoordinates(0, 0, box.min.y).z,
-      zMax = app.scene.toMapCoordinates(0, 0, box.max.y).z;
-  Q3D.gui.initCustomPlaneFolder(zMin, zMax);
-});
-
-// load the scene
-var url = new URL(window.location.href);
-var c = url.searchParams.get("name");
-if(c == null){
-  alert("No Name");
-}
-document.getElementById('ifr').src = "http://"+window.location.hostname+"/matrixmini/?"+c;
-app.loadJSONFile("./data/"+c+"/scene.json", function () {
-  app.start();
-
-  Q3D.gui.init();   // initialize dat-gui panel
-
-  // North arrow inset
-  if (Q3D.Config.northArrow.visible) app.buildNorthArrow(document.getElementById("northarrow"), app.scene.userData.rotation);
-});
-</script>
+            // North arrow inset
+            if (Q3D.Config.northArrow.visible) app.buildNorthArrow(document.getElementById("northarrow"), app.scene.userData.rotation);
+            $("body > div.dg.ac").hide();
+            if(current_layer == "blocks"){
+                show_blocks();
+            }            
+            else if(current_layer == "buildings"){
+                show_buildings();
+            }
+        });
+    }
+    </script>
+    <script type="text/javascript">
+      //click emulate for buildings
+      function toggle_buildings(){
+        $("body > div.dg.ac > div > ul > li:nth-child(1) > div > ul > li:nth-child(2) > div > ul > li.cr.boolean").click();
+        return
+      }
+      function toggle_blocks(){
+        $("body > div.dg.ac > div > ul > li:nth-child(1) > div > ul > li:nth-child(3) > div > ul > li.cr.boolean").click();
+        return
+      }
+      function show_buildings(){
+        app.closePopup();
+        if($("body > div.dg.ac > div > ul > li:nth-child(1) > div > ul > li:nth-child(2) > div > ul > li.cr.boolean > div > div > input[type=checkbox]")[0].checked == false){
+          toggle_buildings();
+        }
+        if($("body > div.dg.ac > div > ul > li:nth-child(1) > div > ul > li:nth-child(3) > div > ul > li.cr.boolean > div > div > input[type=checkbox]")[0].checked == true){
+          toggle_blocks();
+        }
+        current_layer = "buildings";
+        return
+      }
+      function show_blocks(){
+        if($("body > div.dg.ac > div > ul > li:nth-child(1) > div > ul > li:nth-child(2) > div > ul > li.cr.boolean > div > div > input[type=checkbox]")[0].checked == true){
+          toggle_buildings();
+        }
+        if($("body > div.dg.ac > div > ul > li:nth-child(1) > div > ul > li:nth-child(3) > div > ul > li.cr.boolean > div > div > input[type=checkbox]")[0].checked == false){
+          toggle_blocks();          
+        }
+        current_layer = "blocks";
+        return
+      }
+      function toggle_height(){
+        app.closePopup();
+        if($("#squaredFour")[0].checked == true){
+            height_option_1 = false
+        }
+        else if($("#squaredFour")[0].checked == false){
+            height_option_1 = true
+        }
+       render_layers();
+      }
+      function disable_block_div(e){
+        if(e){
+            $("#block_select_text").show();
+            $("#block_controls").addClass("disable");
+        }
+        else{
+            $("#block_select_text").hide();
+            $("#block_controls").removeClass("disable");
+        }
+      }
+      var b_type = null;
+      var b_height = 0;
+      var current_ud = null;
+      function block_worker(ud){
+        disable_block_div(false);
+        current_ud = ud;
+        console.log(ud);
+        id = ud.id.split('-');
+        $("#block_row").html(parseInt(id[0])+1);
+        $("#block_block").html(parseInt(id[1])+1);
+        $("#block_height").val(parseInt(ud.h));
+        $("#block_type").val(ud.cat);
+        b_type = ud.cat;
+        b_height = parseInt(ud.h);
+        $("#block_save").prop('disabled', true)
+      }
+      function block_details_changes(){
+        if($("#block_type").val() != b_type || parseInt($("#block_height").val()) != b_height){
+            $("#block_save").prop('disabled', false)
+        }
+        else{
+            $("#block_save").prop('disabled', true)
+        }
+      }
+      function update_block(){
+        var data = {};
+        id = current_ud.id.split('-');
+        var settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://"+window.location.hostname+":5000/block_update/"+c+"/"+$("#block_type").val()+"/"+$("#block_height").val()+"/"+id[0]+"/"+id[1],
+          "method": "POST",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "data": JSON.stringify(data)
+          }
+        $.ajax(settings).done(function (response) {
+            if(response == "success"){
+                ifr_load();
+                render_layers();
+            }
+        });
+      }
+    </script>
+    <script type="text/javascript">
+    //Initial Functions
+    render_layers();
+    disable_block_div(true);
+    </script>
 </body>
+
 </html>

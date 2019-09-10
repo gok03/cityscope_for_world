@@ -1112,7 +1112,7 @@ limitations:
 
     var layer = app.scene.mapLayers[obj.userData.layerId],
         e = document.getElementById("qr_layername");
-
+    console.log(point);
     // layer name
     if (layer && e) e.innerHTML = layer.properties.name;
 
@@ -1245,6 +1245,7 @@ limitations:
   };
 
   app.closePopup = function () {
+    disable_block_div(true);
     app.popup.hide();
     app.scene.remove(app.queryMarker);
     app.highlightFeature(null);
@@ -1291,7 +1292,9 @@ limitations:
     var canvasOffset = app._offset(app.renderer.domElement);
     var objs = app.intersectObjects(e.clientX - canvasOffset.left, e.clientY - canvasOffset.top);
     var obj, pt;
-
+    if(objs[0].object.userData.layerId == 1){
+      block_worker(objs[0].object.userData)
+    }
     for (var i = 0, l = objs.length; i < l; i++) {
       obj = objs[i];
 
@@ -1310,7 +1313,7 @@ limitations:
 
       app.highlightFeature(object);
       app.render();
-      app.showQueryResult(pt, object);
+      //app.showQueryResult(pt, object);
 
       return;
     }
@@ -2923,12 +2926,21 @@ Q3D.PolygonLayer.prototype.build = function (features) {
       }
 
       // extruded geometry
-      var geom = new THREE.ExtrudeBufferGeometry(shape, {bevelEnabled: false, amount: f.geom.h});
+      if(height_option_1 == false){
+        var geom = new THREE.ExtrudeBufferGeometry(shape, {bevelEnabled: false, amount: f.geom.h});
+      }
+      else if(height_option_1 == true){
+        var geom = new THREE.ExtrudeBufferGeometry(shape, {bevelEnabled: false, amount: 1});
+      }
+
       var color_dict = {"RL":"#052F5F","RM":"#005377","RS":"#06A77D","OL":"#F95738","OM":"#EE964B","OS":"#F4D35E","Amenities":"#EBEBD3","parking":"#262322","road":"#fff"};
       var mesh = new THREE.Mesh(geom, new THREE.MeshBasicMaterial( { color:  color_dict[f.geom.cat]} ));
       //console.log(color_dict[f.geom.cat]);
       mesh.position.z = z;
-
+      mesh.userData.id = f.ids
+      mesh.userData.tags = f.tags
+      mesh.userData.h = f.geom.h
+      mesh.userData.cat = f.geom.cat
       if (f.mtl.border !== undefined) {
         // border
         var border, pt, pts, zFunc = function (x, y) { return 0; };

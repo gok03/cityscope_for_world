@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-console.log("d3 version: ", d3.version);
+//console.log("d3 version: ", d3.version);
 import { RadarChart } from "./radarChart";
 import { RadarMath, radarStruct } from "../radarMath";
 
