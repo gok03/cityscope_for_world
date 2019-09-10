@@ -374,6 +374,8 @@ def find_matrix_points(gdf,h,w):
     return(block_points,points_distance[1])
 
 def reduce_by_05(bounds):
+    #buffer = 0.01
+    buffer = 0.05
     a1 = [bounds[0][0][0][0]+buffer,bounds[0][0][0][1]+buffer]
     a2 = [bounds[0][0][1][0]-buffer,bounds[0][0][1][1]+buffer]
     a3 = [bounds[0][0][2][0]-buffer,bounds[0][0][2][1]-buffer]
