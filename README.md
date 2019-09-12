@@ -2,6 +2,8 @@
 "CityScope" is a concept for shared, interactive computation for urban planning.
 This project is an extension of https://cityio.media.mit.edu application for any part of the world. 
 
+[![cs_for_world.gif](https://media.giphy.com/media/QAJkb0N9RZECegBz9c/giphy.gif)](https://gph.is/g/apVo8PO)
+
 ## Usage
 Use http://cityscope.gok03.com/ to test.  
 1. Select a region within 1 Km2.  
