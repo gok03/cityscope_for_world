@@ -2927,7 +2927,12 @@ Q3D.PolygonLayer.prototype.build = function (features) {
 
       // extruded geometry
       if(height_option_1 == false){
+	if(f.geom.h !== 0){
         var geom = new THREE.ExtrudeBufferGeometry(shape, {bevelEnabled: false, amount: f.geom.h});
+	}
+	else{
+	var geom = new THREE.ExtrudeBufferGeometry(shape, {bevelEnabled: false, amount: 1});
+	}
       }
       else if(height_option_1 == true){
         var geom = new THREE.ExtrudeBufferGeometry(shape, {bevelEnabled: false, amount: 1});
