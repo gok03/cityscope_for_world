@@ -2,7 +2,7 @@
 "CityScope" is a concept for shared, interactive computation for urban planning.
 This project is an extension of https://cityio.media.mit.edu application for any part of the world. 
 
-[![cs_for_world.gif](https://media.giphy.com/media/QAJkb0N9RZECegBz9c/giphy.gif)](https://gph.is/g/apVo8PO)
+[![cs_for_world.gif](https://github.com/gok03/cityscope_for_world/blob/master/csw_demo.gif)]
 
 ## Usage
 Use http://cityscope.gok03.com/ to test.  
@@ -27,10 +27,12 @@ Hamburg (http://cityscope.gok03.com/viewer/?name=hamburg)
 6. Goto your-url and start using the app
 
 ## To-Do
-1. Review citymatrix working for data.
-2. Implement AR for 3js model.
-3. Add more data points to Layers(road, trees, etc).
-4. Implement CS mobility module.
+1. Review citymatrix datapoints(Radar Chart).
+2. Implement Population Statistics.
+3. Implement City Performance Heat-maps.
+4. Implement AR for 3js model.
+5. Add more data points to Layers(road, trees, etc).
+6. Implement CS mobility module.
 
 ## Credits
 Most of the code was clone from https://github.com/CityScope/  
