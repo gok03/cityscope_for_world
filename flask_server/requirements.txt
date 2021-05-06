@@ -1,6 +1,6 @@
 pyproj==2.3.0
 geopy==1.20.0
-Flask_Cors==3.0.8
+Flask_Cors==3.0.9
 osmxtract==0.0.1
 requests==2.22.0
 Flask==1.1.1
