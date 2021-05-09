@@ -5,7 +5,7 @@
   "main": "server.js",
   "dependencies": {
     "body-parser": "^1.17.1",
-    "bson": "^0.4.11",
+    "bson": "^1.1.4",
     "cookie-parser": "^1.4.3",
     "cookie-session": "^1.2.0",
     "cors": "^2.7.1",
